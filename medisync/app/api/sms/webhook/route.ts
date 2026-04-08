@@ -3,12 +3,9 @@ import { createServiceClient } from '@/lib/supabase-server'
 export async function POST(req: Request) {
   const data = await req.json()
 
-  // Telnyx webhook payload structure
-  const payload = data?.data?.payload
-  if (!payload) return new Response('ok')
-
-  const body = (payload.text || '').toLowerCase().trim()
-  const from = payload.from?.phone_number
+  // ClickSend inbound SMS payload
+  const body = (data.body || '').toLowerCase().trim()
+  const from = data.from
 
   if (!from) return new Response('ok')
 
@@ -21,7 +18,6 @@ export async function POST(req: Request) {
     .single()
 
   if (patient) {
-
     const { data: appointment } = await supabase
       .from('appointments')
       .select('id')
@@ -51,11 +47,10 @@ export async function POST(req: Request) {
       appointment_id: appointment?.id || null,
       type: 'sms',
       direction: 'inbound',
-      content: payload.text || '',
+      content: data.body || '',
       status: 'received',
     })
   }
 
-  // Telnyx does not use TwiML — just return 200
   return new Response('ok', { status: 200 })
 }

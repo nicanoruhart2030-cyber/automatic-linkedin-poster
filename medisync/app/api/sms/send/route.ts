@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase-server'
 import { generateSMSReminder } from '@/lib/groq'
-import { sendSMS } from '@/lib/telnyx'
+import { sendSMS } from '@/lib/clicksend'
 
 export async function POST(req: Request) {
   const { appointmentId } = await req.json()
